@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/login.css') }}">
+<!--link rel= "stylesheet"  href= "login.css"-->
+</head>
+<body>
+<div align="center">
+<div class="bg"></div>
+<div class="bg bg2"></div>
+<div class="bg bg3"></div>
+<h1>Generate New Password</h1>
+<form method="post">
+<b>Enter Password:</b>
+<input type="password" id="pwd" name="pwd" minlength="8">
+<label for="pwd">*</label></div>
+<div class="hide">It is a necessary field. Passwords must be of min length 8 and must contain a digit.</div><br>
+<div class="impfield">
+<b>Confirm Password:</b>
+<input type="password" id="pwd" name="conpwd" minlength="8">
+<button type="submit" class="button">Submit</button><br><br>
+</form>
+</div><!--end log form -->
+</body>
+</html>

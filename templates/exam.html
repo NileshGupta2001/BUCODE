@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam: C COMPILER</title>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<!--script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!--script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script-->
+<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script>
+function openNav() {
+  document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+  document.getElementById("mySidenav").style.width = "0";
+}
+
+$(document).ready(function(){
+$("#submitcode").click(function(){
+        var questionid = $("#add_questionid").val();
+		var code = $("#code").val();
+		var table="result";
+		$.post("/cand_add", { table: table,questionid: questionid,code: code}, 
+		function(data) {
+		alert(data);			
+        });
+	});
+});
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lusitana&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/design.css') }}">
+</head>
+<title>Online C Compiler</title>
+<body>
+<div class="page">
+  <header tabindex="0"><span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span><abbr title="Write or paste your code below. You can also run your code for different input cases by selecting the 'enable input' option. Your answer will not be submitted until you clicked 'submit' button. Note: It is required to submit your question id and code for evaluation.   "><i class="fa fa-info-circle" style="font-size:24px; ">C COMPILER</i></abbr></header>
+  <!--div class="sidebar"-->
+  <div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+<ul>
+		<div class="active">
+        <li><a href="{{ url_for('dashboard') }}" ><span>Home</span></a></li>
+		</div>
+		<li><a href="{{ url_for('dashboard') }}"><span>Ask</span></a></li>
+        <li><a href="{{ url_for('viewtests') }}"><span>Tests</span></a></li>
+		<li><a href="{{ url_for('dashboard') }}"><span>Result</span></a></li>
+		
+		
+        <li><a href="{{ url_for('dashboard') }}"class="arrow"><span>Logout</span></a></li>
+      </ul>
+</div>
+<div align="center">
+<div class="container">
+	<form action="/submit" method="post">
+		<label for="code" style="color: black;">Type your code here:</label><br>
+		<abbr title="Enter or paste your code here.">
+		<textarea id="code" name="code" rows="10" cols="100" style="resize:none" required placeholder="//Enter your code here.">{{code}}</textarea></abbr><br>
+		<label for="input" style="color: black;">Enter your input:</label>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<label for="output" style="color: black;">This is the output.</label><br>
+		<!--textarea id="output" name="output" rows="5" cols="50" style="resize:none" placeholder="//Your output here.">{{output}}</textarea-->
+		
+		<!--label for="input">Enter your input:</label><br-->
+		<abbr title="Enter your inputs here.">
+		<textarea id="input" name="input" rows="2" cols="50" style="resize:none" placeholder="//Your Input here.">{{input}}</textarea>
+		</abbr>
+		<abbr title="Your output will be shown here.">
+		<textarea id="output" name="output" rows="2" cols="50" style="resize:none" placeholder="//Your output here.">{{output}}</textarea></abbr><br>
+		<abbr title="Right-click the checkbox to consider inputs for your code.">
+		<input type="checkbox" name="check" id="GFG" 
+                    value="1" {{check}}>Enable input</abbr><br> 
+		<abbr title="Enter the question ID for which the student is submitting the answer.">
+		<input type="text" size="15" placeholder="Enter Question ID:" name="questionid" id="add_questionid"><br><br>
+		</abbr>
+		<abbr title="Click this button to run your code.">
+		<button type="submit">Run Code</button>
+		</abbr>
+		<abbr title="Once you click submit, your answer will be submitted for evaluation.">
+		<button type="submit" id="submitcode">Submit</button>
+		</abbr>
+</form>
+</div>
+</body>
+</html>

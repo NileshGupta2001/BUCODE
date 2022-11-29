@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create a test</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!--script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script-->
+<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script>
+function openNav() {
+  document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+  document.getElementById("mySidenav").style.width = "0";
+}
+
+
+function deadline_countdown(date)
+{
+// Set the date we're counting down to
+var countDownDate = new Date(date).getTime();
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+    
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+    
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+  // Output the result in an element with id="timer"
+  document.getElementById("timer").innerHTML = days + "d " + hours + "h "
+  + minutes + "m " + seconds + "s ";
+    
+  // If the count down is over, write some text 
+  if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("timer").innerHTML = "EXPIRED";
+  }
+}, 1000);
+} 
+ 
+$(document).ready(function(){
+  
+  load_data_all();
+  function load_data_all()
+  {
+   $.ajax({
+    url:"/searchtestall",
+    method:"POST",
+    success:function(res)
+    {
+	  var data = "<tr>";
+      $.each(res,function(index,value){
+		deadline_countdown(value.deadline);
+		data += "<td>"+value.testID+"</td>"+"<td>"+value.testName+"</td>"+"<td>"+value.topic+"</td>"+"<td>"+value.input+"</td>"+"<td>"+value.output+"</td>"+"<td>"+value.skill+"</td>"+"<td><p id='timer'></p></td>"+"<td><a href='{{ url_for('exam') }}' ><span style='background-color:powderblue; text-decoration: underline;'>Start</span></a></td></tr>";
+      });
+      $("tbody").html(data);
+    }
+   });
+  }
+  
+  function load_data_by_name(query)
+  {
+   $.ajax({
+    url:"/searchtestbyname",
+    method:"POST",
+    data:{query:query},
+    success:function(res)
+    {
+	  var data = "<tr>";
+      $.each(res,function(index,value){
+		data += "<td>"+value.testID+"</td>"+"<td>"+value.testName+"</td>"+"<td>"+value.topic+"</td>"+"<td>"+value.input+"</td>"+"<td>"+value.output+"</td>"+"<td>"+value.skill+"</td>"+ "<td>"+value.deadline+"</td>"+"<td><a href='{{ url_for('exam') }}' ><span style='background-color:powderblue; text-decoration: underline;'>Start</span></a></td></tr>";
+      });
+      $("tbody").html(data);
+    }
+   });
+  }
+  
+  function load_data_by_skills(query)
+  {
+   $.ajax({
+    url:"/searchtestbyskills",
+    method:"POST",
+    data:{query:query},
+    success:function(res)
+    {
+	  var data = "<tr>";
+      $.each(res,function(index,value){
+		data += "<td>"+value.testID+"</td>"+"<td>"+value.testName+"</td>"+"<td>"+value.topic+"</td>"+"<td>"+value.input+"</td>"+"<td>"+value.output+"</td>"+"<td>"+value.skill+"</td>"+ "<td>"+value.deadline+"</td>"+"<td><a href='{{ url_for('exam') }}' ><span style='background-color:powderblue; text-decoration: underline;'>Start</span></a></td></tr>";
+      });
+      $("tbody").html(data);
+    }
+   });
+  }
+  
+  $('#search_text_by_name').keyup(function(){
+    var search = $(this).val();
+    if(search != ''){
+    load_data_by_name(search);
+   }else{
+    load_data_by_name();
+   }
+  });
+  $('#search_text_by_skills').keyup(function(){
+    var search = $(this).val();
+    if(search != ''){
+    load_data_by_skills(search);
+   }else{
+    load_data_by_skills();
+   }
+  });
+    
+	/*
+	window.onload=function()	
+	{
+	PrintElem();
+	}
+  */
+});
+</script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lusitana&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/test.css') }}">
+<!--link rel= "stylesheet"  href= "candreg.css"-->
+</head>
+<body>
+<div class="page">
+  <header tabindex="0"><span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>VIEW YOUR TESTS</header>
+  <!--div class="sidebar"-->
+  <div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+<ul>
+        <li><a href="{{ url_for('dashboard') }}" ><span>Home</span></a></li>
+		<li><a href="{{ url_for('dashboard') }}"><span>Ask</span></a></li>
+		<div class="active">
+        <li><a href="{{ url_for('viewtests') }}"><span>Tests</span></a></li>
+		</div>
+		<li><a href="{{ url_for('dashboard') }}"><span>Result</span></a></li>
+		
+		
+        <li class="small"><a href="{{ url_for('dashboard') }}"class="arrow"><span>Logout</span></a></li>
+      </ul>
+</div>
+<div align="center">
+<div class="container">
+<div class="table-responsive"> 
+<div class="module">
+<div class='btn btn-warning' id="displaymessage" style="display:none;width:100%;margin-top:10px;"></div>
+<div class='btn btn-success' id="successdisplaymessage" style="display:none;width:100%;margin-top:10px;"></div>
+<table class="table table-bordered" id="myTable">
+  <thead>
+      <tr>
+		 <th></th>
+         <th ><input type="text" id="search_text_by_name" name="search_text_by_name" placeholder="Search question"/></th>
+         <th ><input type="text" id="search_text_by_skills" placeholder="Search using topic"/></</th>
+         <th ></th>
+		 <th ></th>
+		 <th ></th>
+		 <th></th>
+		 <th ><input type="submit" class="btn btn-secondary" value="Search All"></th>
+      </tr>
+	  <thead>
+	  <tr>
+		 <th>ID</th>
+         <th>Question</th>
+         <th>Topic</th>
+         <th>Input</th>
+		 <th>Output</th>
+		 <th>Skills</th>
+		 <th>Deadline</th>
+		 <th style="width:80px;">Open Test</th>
+      </tr>
+	  </thead>
+	  <tbody>
+	  <div id="myrow"></div> 
+   </tbody>
+</table>
+
+<!--
+<b>Enter the date test was created on:</b>
+<input type="date" placeholder="(dd-mm-yyyy):" name="AddedOn"><br><br>
+<b>Enter the date test was modified on:</b>
+<input type="date" placeholder="(dd-mm-yyyy):" name="ModifiedOn"><br><br>
+-->
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

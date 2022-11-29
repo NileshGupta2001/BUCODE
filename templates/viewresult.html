@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create a test</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!--script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script-->
+<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script>
+function openNav() {
+  document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+  document.getElementById("mySidenav").style.width = "0";
+}
+
+
+function deadline_countdown(date)
+{
+// Set the date we're counting down to
+var countDownDate = new Date(date).getTime();
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+    
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+    
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+  // Output the result in an element with id="timer"
+  document.getElementById("timer").innerHTML = days + "d " + hours + "h "
+  + minutes + "m " + seconds + "s ";
+    
+  // If the count down is over, write some text 
+  if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("timer").innerHTML = "EXPIRED";
+  }
+}, 1000);
+} 
+ 
+$(document).ready(function(){
+  
+  load_data_all();
+  function load_data_all()
+  {
+   $.ajax({
+    url:"/studsearchresultall",
+    method:"POST",
+    success:function(res)
+    {
+	  var data = "<tr>";
+      $.each(res,function(index,value){
+		data += "<td>"+value.questionid+"</td>"+"<td>"+value.question+"</td>"+"<td><a href='/return-files/' target='_blank'>Download!</a></td>"+"<td>"+value.plag_score+"</td>"+"<td>"+value.score+"</td>"+"</tr>";
+      });
+      $("tbody").html(data);
+    }
+   });
+  }
+  
+  function load_data_by_name(query)
+  {
+   $.ajax({
+    url:"/studsearchresultbyqid",
+    method:"POST",
+    data:{query:query},
+    success:function(res)
+    {
+	  var data = "<tr>";
+      $.each(res,function(index,value){
+		data += "<td>"+value.questionid+"</td>"+"<td>"+value.question+"</td>"+"<td><a href='/return-files/' target='_blank'>Download!</a></td>"+"<td>"+value.plag_score+"</td>"+"<td>"+value.score+"</td>"+"</tr>";
+      });
+      $("tbody").html(data);
+    }
+   });
+  }
+  
+  $('#search_text_by_qid').keyup(function(){
+    var search = $(this).val();
+    if(search != ''){
+    load_data_by_name(search);
+   }else{
+    load_data_by_name();
+   }
+  });
+    
+	$("body").on("click", ".btn-secondary", function(){  
+        load_data_all();		  
+    });
+	/*
+	window.onload=function()	
+	{
+	PrintElem();
+	}
+  */
+});
+</script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lusitana&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/test.css') }}">
+<!--link rel= "stylesheet"  href= "candreg.css"-->
+</head>
+<body>
+<div class="page">
+  <header tabindex="0"><span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span><abbr title="Student can view their result in this page. To search a question by question id , simply put the question id on the search bar or use 'searchall' button to search all the results. Note: the result that are empty or null have not been market yet by the teacher."><i class="fa fa-info-circle" style="font-size:24px; ">VIEW RESULT</i></abbr></header>
+  <!--div class="sidebar"-->
+  <div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+<ul>
+        <li><a href="{{ url_for('dashboard') }}" ><span>Home</span></a></li>
+		<li><a href="{{ url_for('dashboard') }}"><span>Ask</span></a></li>
+        <li><a href="{{ url_for('viewtests') }}"><span>Tests</span></a></li>
+		<div class="active">
+		<li><a href="{{ url_for('viewresult') }}"><span>Result</span></a></li>
+		</div>
+		
+        <li class="small"><a href="{{ url_for('dashboard') }}"class="arrow"><span>Logout</span></a></li>
+      </ul>
+</div>
+<div align="center">
+<div class="container">
+<div class="table-responsive"> 
+<div class="module">
+<div class='btn btn-warning' id="displaymessage" style="display:none;width:100%;margin-top:10px;"></div>
+<div class='btn btn-success' id="successdisplaymessage" style="display:none;width:100%;margin-top:10px;"></div>
+<table class="table table-bordered" id="myTable">
+  <thead>
+      <tr>
+		 <th><abbr title="View result by searching question id."><input type="text" id="search_text_by_qid" name="search_text_by_qid" placeholder="Search question"/></abbr></th>
+         <th ></th>
+		 <th ></th>
+		 <th ></th>
+		 <th ><input type="submit" class="btn btn-secondary" value="Search All"></th>
+      </tr>
+	  <thead>
+	  <tr>
+		 <th>QuestionID</th>
+         <th>Question</th>
+         <th>Code</th>
+         <th>Plagiarism Score</th>
+		 <th>Score</th>
+      </tr>
+	  </thead>
+	  <tbody>
+	  <div id="myrow"></div> 
+   </tbody>
+</table>
+
+<!--
+<b>Enter the date test was created on:</b>
+<input type="date" placeholder="(dd-mm-yyyy):" name="AddedOn"><br><br>
+<b>Enter the date test was modified on:</b>
+<input type="date" placeholder="(dd-mm-yyyy):" name="ModifiedOn"><br><br>
+-->
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

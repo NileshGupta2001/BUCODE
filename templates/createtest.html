@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEST CREATION</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!--script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script-->
+<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script>
+function openNav() {
+  document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+  document.getElementById("mySidenav").style.width = "0";
+}
+
+
+function deadline_countdown(date)
+{
+// Set the date we're counting down to
+var countDownDate = new Date(date).getTime();
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+    
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+    
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+  // Output the result in an element with id="timer"
+  document.getElementById("timer").innerHTML = days + "d " + hours + "h "
+  + minutes + "m " + seconds + "s ";
+    
+  // If the count down is over, write some text 
+  if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("timer").innerHTML = "EXPIRED";
+  }
+}, 1000);
+} 
+ 
+$(document).ready(function(){
+  
+  load_data_all();
+  function load_data_all()
+  {
+   $.ajax({
+    url:"/searchtestall",
+    method:"POST",
+    success:function(res)
+    {
+	  var data = "<tr>";
+      $.each(res,function(index,value){
+		data += "<td>"+value.testID+"</td>"+"<td>"+value.testName+"</td>"+"<td>"+value.topic+"</td>"+"<td>"+value.input+"</td>"+"<td>"+value.output+"</td>"+"<td>"+value.skill+"</td>"+"<td>"+value.deadline+"</td>"+"<td><button class='btn btn-info btn-xs btn-edit' >Edit</button><button class='btn btn-danger btn-xs btn-delete'>Delete</button></td></tr>";
+      });
+      $("tbody").html(data);
+    }
+   });
+  }
+  
+  function load_data_by_name(query)
+  {
+   $.ajax({
+    url:"/searchtestbyname",
+    method:"POST",
+    data:{query:query},
+    success:function(res)
+    {
+	  var data = "<tr>";
+      $.each(res,function(index,value){
+		data += "<td>"+value.testID+"</td>"+"<td>"+value.testName+"</td>"+"<td>"+value.topic+"</td>"+"<td>"+value.input+"</td>"+"<td>"+value.output+"</td>"+"<td>"+value.skill+"</td>"+ "<td>"+value.deadline+"</td>"+"<td><button class='btn btn-info btn-xs btn-edit' >Edit</button><button class='btn btn-danger btn-xs btn-delete'>Delete</button></td></tr>";
+      });
+      $("tbody").html(data);
+    }
+   });
+  }
+  
+  function load_data_by_skills(query)
+  {
+   $.ajax({
+    url:"/searchtestbyskills",
+    method:"POST",
+    data:{query:query},
+    success:function(res)
+    {
+	  var data = "<tr>";
+      $.each(res,function(index,value){
+		data += "<td>"+value.testID+"</td>"+"<td>"+value.testName+"</td>"+"<td>"+value.topic+"</td>"+"<td>"+value.input+"</td>"+"<td>"+value.output+"</td>"+"<td>"+value.skill+"</td>"+ "<td>"+value.deadline+"</td>"+"<td><button class='btn btn-info btn-xs btn-edit' >Edit</button><button class='btn btn-danger btn-xs btn-delete'>Delete</button></td></tr>";
+      });
+      $("tbody").html(data);
+    }
+   });
+  }
+  
+  $('#search_text_by_name').keyup(function(){
+    var search = $(this).val();
+    if(search != ''){
+    load_data_by_name(search);
+   }else{
+    load_data_by_name();
+   }
+  });
+  $('#search_text_by_skills').keyup(function(){
+    var search = $(this).val();
+    if(search != ''){
+    load_data_by_skills(search);
+   }else{
+    load_data_by_skills();
+   }
+  });
+  
+  // declaring global variables
+	var currentRow;
+	var cur_questionID;
+	var cur_question;
+	var cur_topic;
+	var cur_input;
+	var cur_output;
+	var cur_skills;
+	var cur_deadline;
+	var editmode=false;
+  // Show Input element
+    $("body").on("click", ".btn-edit", function(){  
+		if(editmode==false){
+		currentRow=$(this).closest("tr"); 
+		editmode=true;
+		$(this).parents("tr").find("td:eq(7)").prepend("<button class='btn btn-update'>Update</button><button class='btn btn-cancel'>Cancel</button>");
+		$(this).hide();    
+		$(this).parents("tr").find(".btn-delete").hide();
+        $(this).parents("tr").find("td:not(:last-child)").each(function(i){
+			if(i=='0'){
+				cur_questionID= currentRow.find("td:eq(0)").text();
+            } else if (i=='1'){
+                var idname = 'question';
+				var fieldtype = 'text';
+				cur_question = currentRow.find("td:eq(1)").text();
+            }else if (i=='2'){
+                var idname = 'topic';
+				var fieldtype = 'text';
+				cur_topic = currentRow.find("td:eq(2)").text();
+            }else if (i=='3'){
+                var idname = 'input';
+				var fieldtype = 'text';
+				cur_input = currentRow.find("td:eq(3)").text();
+			}else if (i=='4'){
+                var idname = 'output';
+				var fieldtype = 'text';
+				cur_output = currentRow.find("td:eq(4)").text();
+			}else if (i=='5'){
+                var idname = 'skills';
+				var fieldtype = 'text';
+				cur_skills = currentRow.find("td:eq(5)").text();
+			}else if (i=='6'){
+                var idname = 'deadline';
+				var fieldtype = 'datetime-local';
+				cur_deadline = currentRow.find("td:eq(6)").val();
+				/*cur_deadline += $(el).find('input[name=]').val();  el represents catched jquery object for view reference
+
+				alert(cur_deadline);
+				var countDownDate = new Date(cur_deadline).getTime();*/
+				
+			}
+			else{} 
+			if(idname=='skills'){
+				$(this).html("<center><table class='noBorder' id='newtable'><thead><tr class='noBorder'><td class='noBorder'><input type='checkbox' id='add_python' class='skills' value='python'></td><td class='noBorder'><label for='add_python' style='color:black; padding-top:6px;'> Python</label></td></tr><tr class='noBorder'><td class='noBorder';><input type='checkbox' id='add_C++' class='skills' value='C++'></td><td class='noBorder'><label style='color:black; padding-top:6px;' for='add_C++' > C++</label></td></tr><tr class='noBorder'><td class='noBorder';><input type='checkbox' id='add_C' class='skills' value='C'></td><td class='noBorder'><label style='color:black; padding-top:6px;' for='add_C' > C</label></td></tr><tr class='noBorder'><td class='noBorder'><input type='checkbox' id='add_java' class='skills' value='Java'></td><td class='noBorder'><label for='add_Java' style='color:black; padding-top:6px;'>Java</label></td></tr></thead></table></center>");
+			}else if(idname=='input'){
+				$(this).html('<textarea class="textarea" id="input"></textarea>');
+			}else if (idname=='topic'){
+				$(this).html("<select id='topic'><option value='Basic Programming'>Basic Programming</option> <option value='Data Structures'>Data Structures</option><option value='Math'>Math</option><option value='Machine Learning'>Machine Learning</option><option value='Algorithms'>Algorithms</option></select>");
+			}else if(i!=0){
+			$(this).html('<input type="' + fieldtype + '" name="updaterec" id="' + idname + '" size="7" value="' + $(this).text() + '">');
+			}else{} 
+        }); 
+		}else{
+			alert("There is already one row in edit mode. You cannot edit another at the same time.");
+		}
+		/*
+		$(this).parents("tr").find("td:eq(9)").append("<button class='btn btn-update'>Update</button><button class='btn btn-cancel'>Cancel</button>");
+		$(this).hide();    
+		$(this).parents("tr").find(".btn-delete").hide();
+		*/
+		
+    });
+	
+	$("body").on("click", ".btn-cancel", function(){  
+		var currentRow=$(this).closest("tr"); 
+		editmode=false;
+        $(this).parents("tr").find("td:not(:last-child)").each(function(i){
+            if (i=='1'){
+                $(this).parents("tr").find('td:eq("' + i + '")').text(cur_question);
+            }else if (i=='2'){
+                $(this).parents("tr").find('td:eq("' + i + '")').text(cur_topic);
+            }else if (i=='3'){
+                $(this).parents("tr").find('td:eq("' + i + '")').text(cur_input);
+			}else if (i=='4'){
+                $(this).parents("tr").find('td:eq("' + i + '")').text(cur_output);
+			}else if (i=='5'){
+                $(this).parents("tr").find('td:eq("' + i + '")').text(cur_skills);
+			}else if (i=='6'){
+				alert(cur_deadline);
+                $(this).parents("tr").find('td:eq("' + i + '")').text(cur_deadline);
+            }else{} 
+        });  
+        $(this).parents("tr").find(".btn-edit").show(); 
+		$(this).parents("tr").find(".btn-delete").show();		
+        $(this).parents("tr").find(".btn-update").remove();  
+        $(this).parents("tr").find(".btn-cancel").remove();  
+    }); 
+  
+	$("body").on("click", ".btn-update", function(){  
+        var string = cur_questionID;
+		var table="questions";
+        var question = $("#question").val();
+		var topic = $("#topic").val();
+        var input = $("#input").val();
+        var output = $("#output").val();
+		var insert_skills = [];
+		$('.skills').each(function() {
+			if ($(this).is(":checked")) 
+			{
+                insert_skills.push($(this).val());
+            }
+        });       
+        var skills = insert_skills.toString();
+		var deadline = $("#deadline").val();
+		alert(deadline);
+		$.post("/table_update", { table: table,string: string,question: question, topic: topic, input: input, output:output, skills: skills, deadline: deadline}, function(data) {
+            $("#displaymessage").html(data);
+            $("#displaymessage").show();
+			alert("Record Updated Successfully. Site needs to reload.");
+			location.reload();
+        });
+		
+          
+        $(this).parents("tr").find(".btn-edit").show();  
+		$(this).parents("tr").find(".btn-delete").show();
+        $(this).parents("tr").find(".btn-cancel").remove();  
+        $(this).parents("tr").find(".btn-update").remove();  
+    });  
+	
+	$("body").on("click", ".btn-outline-primary", function(){  
+        var question = $("#add_question").val();
+		var table="questions";
+        var topic = $("#add_topic").val();
+        var input = $("#add_input").val();
+		var output = $("#add_output").val();
+		var insert_skills = [];
+		$('.add_skills').each(function() {
+			if ($(this).is(":checked")) 
+			{
+                insert_skills.push($(this).val());
+            }
+        });       
+        var skills = insert_skills.toString();
+		var deadline = $("#add_deadline").val();
+		$.post("/cand_add", { table: table,question: question, topic: topic, input:input, output: output, skills: skills,deadline: deadline}, 
+		function(data) {
+		$("#displaymessage").html(data);
+		$("#displaymessage").show();
+			
+        });
+		  
+    }); 
+	
+	$("body").on("click", ".btn-secondary", function(){  
+        load_data_all();		  
+    });
+	
+	$("body").on("click", ".btn-delete", function(){  
+		if (confirm("Are you sure you want delete this question?") == true)
+		{
+			currentRow=$(this).closest("tr"); 
+			cur_questionID= currentRow.find("td:eq(0)").text();
+			$(this).parents("tr").remove();
+			var string = cur_questionID;
+			var table="questions";
+			$.post("/cand_delete", { table: table, string: string}, function(data) {
+				$("#displaymessage").html(data);
+				$("#displaymessage").show();
+				alert("Record Deleted Successfully. Site needs to reload.");
+				location.reload();
+			});
+		}else{}
+    });
+	/*
+	window.onload=function()	
+	{
+	PrintElem();
+	}
+  */
+});
+</script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lusitana&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/test.css') }}">
+<!--link rel= "stylesheet"  href= "candreg.css"-->
+</head>
+<body>
+<div class="page">
+  <header tabindex="0"><span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span><abbr title="Teacher can add/delete/update a question in this page.  "><i class="fa fa-info-circle" style="font-size:24px; ">MANAGE ACTIVE QUESTIONS</i></abbr></header>
+  <!--div class="sidebar"-->
+  <div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+<ul>
+        <li><a href="{{ url_for('dashboardteacher') }}" ><span>Home</span></a></li>
+		<li><a href="{{ url_for('dashboardteacher') }}"><span>Ask</span></a></li>
+		<div class="active">
+        <li><a href="{{ url_for('createtest') }}"><span>Create Test</span></a></li>
+		</div>
+		<li><a href="{{ url_for('dashboard') }}"><span>Mark Answers</span></a></li>
+		
+		
+        <li><a href="{{ url_for('dashboard') }}"class="arrow"><span>Logout</span></a></li>
+      </ul>
+</div>
+<div align="center">
+<div class="container">
+<div class="table-responsive"> 
+<div class="module">
+<div class='btn btn-warning' id="displaymessage" style="display:none;width:100%;margin-top:10px;"></div>
+<div class='btn btn-success' id="successdisplaymessage" style="display:none;width:100%;margin-top:10px;"></div>
+<table class="table table-bordered" id="myTable">
+  <thead>
+      <tr>
+		 <th></th>
+         <th ><input type="text" id="search_text_by_name" name="search_text_by_name" placeholder="Search question"/></th>
+         <th ><input type="text" id="search_text_by_skills" placeholder="Search using topic"/></</th>
+         <th ></th>
+		 <th ></th>
+		 <th ></th>
+		 <th></th>
+		 <th ><input type="submit" class="btn btn-secondary" value="Search All"></th>
+      </tr>
+	  <thead>
+	  <tr>
+		 <th>ID</th>
+         <th>Question</th>
+         <th>Topic</th>
+         <th>Input</th>
+		 <th>Output</th>
+		 <th>Skills</th>
+		 <th>Deadline</th>
+		 <th style="width:80px;">Edit/Delete</th>
+      </tr>
+	  </thead>
+	  <tbody>
+	  <div id="myrow"></div> 
+   </tbody>
+	  <tfoot>
+ <!--form action="https://candidateinterview.azurewebsites.net/candsuc" method="post"-->
+	<tr>
+	<!--form action="http://127.0.0.1:5000/candsuc" method="post"-->
+	<td></td>
+	<td>
+	<div class="impfield">
+	<abbr title="Describe question. Max size limit: 2000 characters ">
+	<input type="text" size="15" placeholder="Enter Question:" name="question" id="add_question">	
+	</abbr>
+	<label for="add_question">*</label></div>
+	<div class="hide">It is a necessary field.</div>
+	</td>
+    <td >
+	<div class="impfield">
+	<abbr title="Select topic for your question.">
+	<!--input type="text" size="15" placeholder="Enter Topic:" name="topic" id="add_topic"-->
+	<select id='add_topic'><option value='Basic Programming'>Basic Programming</option> <option value='Data Structures'>Data Structures</option><option value='Math'>Math</option><option value='Machine Learning'>Machine Learning</option><option value='Algorithms'>Algorithms</option></select>
+	</abbr>
+	<label for="add_topic">*</label></div>
+	<div class="hide">It is a necessary field.</div>
+	</td>
+    <td>
+	<div class="impfield">
+	<abbr title="Add the inputs required. Max size limit: 2000 characters ">
+	<textarea class="textarea"  name="input" id="add_input"></textarea>
+	</abbr>
+	<!--input type="text" size="10" placeholder="Enter Input:" name="input" id="add_input"-->
+	<label for="add_input">*</label></div>
+	<div class="hide">It is a necessary field.</div>
+	</td>
+	<td>
+	<div class="impfield">
+	<abbr title="Add output that will be displayed. Max size limit: 2000 characters ">
+	<input type="text" size="10" placeholder="Enter Output:" name="output" id="add_output">
+	</abbr>
+	<label for="add_output">*</label></div>
+	<div class="hide">It is a necessary field.</div>
+	</td>
+	<td>
+	<abbr title="Select the compiler required for the question.">
+	<center><table class='noBorder' id='newtable'><thead><tr class='noBorder'><td class='noBorder'><input type='checkbox' id='add_python' class='add_skills' value='python'></td><td class='noBorder'><label for='add_python' style='color:black; padding-top:6px;'> Python</label></td></tr><tr class='noBorder'><td class='noBorder';><input type='checkbox' id='add_C++' class='add_skills' value='C++'></td><td class='noBorder'><label style='color:black; padding-top:6px;' for='add_C++' >C++</label></td></tr><tr class='noBorder'><td class='noBorder';><input type='checkbox' id='add_C' class='add_skills' value='C'></td><td class='noBorder'><label style='color:black; padding-top:6px;' for='add_C' >C</label></td></tr><tr class='noBorder'><td class='noBorder'><input type='checkbox' id='add_java' class='add_skills' value='Java'></td><td class='noBorder'><label for='add_Java' style='color:black; padding-top:6px;'>Java</label></td></tr></thead></table></center>
+	</abbr>
+	</td>
+	<td>
+	<div class="impfield">
+	<abbr title="Select the deadline for the question. ">
+	<input type="datetime-local" placeholder="(dd-mm-yyyy):" name="deadline" id="add_deadline"><br><br>
+	<label for="add_output">*</label></div>
+	<div class="hide">It is a necessary field.</div>
+	</td>
+	<td>
+	<abbr title="Click add to create a test. ">
+	<input type="submit" class="btn btn-outline-primary" value="ADD">
+	</abbr>
+	</td>
+	<!--/form-->
+   </tr>
+   </tfoot>
+<!--form action="https://candidateinterview.azurewebsites.net/panelsuc" method="post" class="module-border-wrap"-->
+<!--form action="http://127.0.0.1:5000/panelsuc" method="post" class="module-border-wrap">
+<div class="impfield">
+<b>Enter Panel Name:</b>
+<input type="text" placeholder="Enter name for the panel here.." name="panelName" size="30">
+<label for="panelName">*</label></div>
+<div class="hide">It is a necessary field.</div><br>
+<div class="impfield">
+<b>Enter Panel Designation:</b>
+<input type="text" size="30" placeholder="Enter candidates designated for panel" name="panelDesignation">
+<label for="panelDesignation">*</label></div>
+<div class="hide">It is a necessary field.</div><br>
+<div class="impfield">
+<b>Enter Panel Skills:</b>
+<input type="text" size="30" placeholder="Enter Skills for evaluation eg.C++" name="panelSkills">
+<label for="panelSkills">*</label></div>
+<div class="hide">It is a necessary field.</div><br>
+<!--
+<b>Enter the date panel was created on:</b>
+<input type="date" placeholder="(dd-mm-yyyy):" name="AddedOn"><br><br>
+<b>Enter the date panel was modified on:</b>
+<input type="date" placeholder="(dd-mm-yyyy):" name="ModifiedOn"><br><br>
+>
+<div class="impfield">
+<b>Is the panel currently active?:</b>
+Yes:
+<input type="radio" name="IsActive" value="yes">No:
+<input type="radio" name="IsActive" value="no">
+<label for="IsActive">*</label></div>
+<div class="hide">It is a necessary field.</div><br>
+<input type="submit" value="Add Panel" class="button"><br-->
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
+<!--
+<b>Enter the date test was created on:</b>
+<input type="date" placeholder="(dd-mm-yyyy):" name="AddedOn"><br><br>
+<b>Enter the date test was modified on:</b>
+<input type="date" placeholder="(dd-mm-yyyy):" name="ModifiedOn"><br><br>
+-->
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

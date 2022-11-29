@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+<link href="https://fonts.googleapis.com/css2?family=Lusitana&display=swap" rel="stylesheet">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/login.css') }}">
+<!--link rel= "stylesheet"  href= "login.css"-->
+</head>
+<body>
+<div align="center">
+<div class="bg"></div>
+<div class="bg bg2"></div>
+<div class="bg bg3"></div>
+<div class="white-box">
+<p class="detail">BU<span class="name"> CODE</span></p>
+</div><!--/div-->
+<br><br>
+<h2>Login to your student account</h2>
+<form method="post">
+<b>Enter Email:</b>
+<input type="text" name="email" placeholder="type your email here" />
+<b>Enter Password:</b>
+<input type="password" id="pwd" name="pwd" placeholder="type your password here" />
+<button class="log" type="submit">Login</button>
+<a href="{{ url_for('index') }}">
+<button class="reg">Register</button></a><br><br>
+<a class="forgot" href="{{ url_for('verify') }}">Forgot password?</a><br><br>
+<a class="forgot" href="{{ url_for('teacherlogin') }}">Sign in as Teacher</a><br><br>
+</form>
+</div><!--end log form -->
+</body>
+</html>

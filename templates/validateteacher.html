@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+<link href="https://fonts.googleapis.com/css2?family=Lusitana&display=swap" rel="stylesheet">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/login.css') }}">
+<!--link rel= "stylesheet"  href= "login.css"-->
+</head>
+<body>
+<div align="center">
+<div class="bg"></div>
+<div class="bg bg2"></div>
+<div class="bg bg3"></div>
+<h1>Verify Email</h1>
+<form method="post">
+<b>Enter OTP:</b>
+<input type="text" placeholder="Enter otp here" name="otp">
+<button type="submit" class="button">Verify</button><br><br>
+</form>
+</div><!--end log form -->
+</body>
+</html>
